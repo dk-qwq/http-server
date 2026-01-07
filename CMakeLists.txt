@@ -12,9 +12,7 @@ include_directories(src)
 set(SRC_DIR src)
 set(TEST_DIR test)
 
-set(CMAKE_CXX_STANDARD 23)
-
-# set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CXX_STANDARD 20)
 
 add_executable(SimpleHttpServer
     ${SRC_DIR}/main.cc

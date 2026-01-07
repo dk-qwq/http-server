@@ -69,7 +69,8 @@ public:
         headers_[key] = std::move(value);
     }
     void SetContent(const std::string& content) {
-        content_ = std::move(content);
+        content_ = content;
+        SetContentLength();
     }
     HttpVersion version() const {
         return version_;
@@ -91,6 +92,9 @@ protected:
     std::string content_;
 
     friend std::string to_string(const HttpVersion& version);
+    void SetContentLength() {
+        SetHeader("Content-Length", std::to_string(content_.length()));
+    }
 };
 
 std::string to_string(const HttpVersion& version);
@@ -124,7 +128,7 @@ private:
 
 class HttpResponse : public HttpMessageInfterface {
 public:
-    HttpResponse(HttpStatusCode status_code)
+    HttpResponse(HttpStatusCode status_code = HttpStatusCode::Ok)
         :status_code_(status_code) {}
     void SetStatuscode(HttpStatusCode status_code) {
         status_code_ = status_code;
