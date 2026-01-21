@@ -206,7 +206,6 @@ void HttpServer::HandlerEpollEvent(int epoll_fd, std::uint32_t event, EventData*
             }
         } else if(byte_count == 0) {
             ControlEpollEvent(epoll_fd, EPOLL_CTL_DEL, fd);
-                    std::cerr << "unexpected response->length < 0" << std::endl;
             delete response;
         } else {
             if(errno == EAGAIN || errno == EWOULDBLOCK) {

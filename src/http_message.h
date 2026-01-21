@@ -1,5 +1,4 @@
-#ifndef HTTP_MESSAGE_H_
-#define HTTP_MESSAGE_H_
+#pragma once
 
 #include <string>
 #include <map>
@@ -61,12 +60,21 @@ enum class HttpStatusCode {
   HttpVersionNotSupported = 505
 };
 
+HttpVersion string_to_version(const std::string& version_string);
+HttpMethod string_to_method(const std::string& method_string);
 
-class HttpMessageInfterface {
+
+class HttpMessageInterface {
 public:
-    HttpMessageInfterface(): version_(HttpVersion::HTTP_1_1) {}
+    HttpMessageInterface(): version_(HttpVersion::HTTP_1_1) {}
+    void SetVersion(const std::string& version_string) {
+        version_ = string_to_version(version_string);
+    }
     void SetHeader(const std::string& key, const std::string& value) {
         headers_[key] = std::move(value);
+    }
+    void AppendContent(const std::string& str) {
+        content_.append(str);
     }
     void SetContent(const std::string& content) {
         content_ = content;
@@ -99,18 +107,19 @@ protected:
 
 std::string to_string(const HttpVersion& version);
 
-
-HttpVersion string_to_version(const std::string& version_string);
-HttpMethod string_to_method(const std::string& method_string);
-
-
-class HttpRequest : public HttpMessageInfterface {
+class HttpRequest : public HttpMessageInterface {
 public:
     void SetMethod(HttpMethod method) {
         method_ = method;
     }
+    void SetMethod(const std::string& method_string) {
+        method_ = string_to_method(method_string);
+    }
     void SetUri(const Uri& uri) {
         uri_ = uri;
+    }
+    void SetUri(const std::string& path) {
+        uri_ = Uri(path);
     }
     HttpMethod method() const {
         return method_;
@@ -122,11 +131,11 @@ private:
     HttpMethod method_;
     Uri uri_;
 
-    friend HttpRequest string_to_request(const std::string& request_string);
+    // friend HttpRequest string_to_request(const std::string& request_string);
 };
 
 
-class HttpResponse : public HttpMessageInfterface {
+class HttpResponse : public HttpMessageInterface {
 public:
     HttpResponse(HttpStatusCode status_code = HttpStatusCode::Ok)
         :status_code_(status_code) {}
@@ -143,9 +152,7 @@ private:
     friend std::string to_string(const HttpResponse& response, bool Is_sendContent);
 };
 
-HttpRequest string_to_request(const std::string& request_string);
+// HttpRequest string_to_request(const std::string& request_string);
 
 std::string to_string(const HttpStatusCode& status_code);
 std::string to_string(const HttpResponse& response, bool Is_sendContent);
-
-#endif

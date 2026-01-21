@@ -157,7 +157,7 @@ HttpRequest string_to_request(const std::string& request_string) {
 
     lpos = rpos + 2;
     rpos = request_string.find("\r\n\r\n", lpos);
-    if(rpos != std::string:: npos) {
+    if(rpos != std::string::npos) {
         headers = request_string.substr(lpos, rpos - lpos);
 
         if(rpos + 4 < request_string.length()) {

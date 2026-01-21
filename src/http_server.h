@@ -1,5 +1,4 @@
-#ifndef HTTP_SERVER_H_
-#define HTTP_SERVER_H_
+#pragma once
 
 #include <sys/epoll.h>
 
@@ -81,6 +80,3 @@ private:
 
     void HandleHttpData(const EventData& raw_request, EventData* raw_response);
 };
-
-
-#endif

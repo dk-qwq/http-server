@@ -1,5 +1,4 @@
-#ifndef URI_H_
-#define URI_H_
+#pragma once
 
 #include <string>
 #include <cctype>
@@ -28,5 +27,3 @@ private:
         for(auto& v: path_) v = static_cast<char>(tolower(v));
     }
 };
-
-#endif

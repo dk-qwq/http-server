@@ -24,6 +24,7 @@ add_executable(test_SimpleHttpServer
     ${TEST_DIR}/main.cc
     ${SRC_DIR}/http_server.cc
     ${SRC_DIR}/http_message.cc
+    ${SRC_DIR}/http_parser.cc
 )
 
 target_link_libraries(SimpleHttpServer PRIVATE Threads::Threads)
