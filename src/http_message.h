@@ -60,9 +60,11 @@ enum class HttpStatusCode {
   HttpVersionNotSupported = 505
 };
 
+std::string to_string(const HttpVersion& version);
+std::string to_string(const HttpMethod& method);
+
 HttpVersion string_to_version(const std::string& version_string);
 HttpMethod string_to_method(const std::string& method_string);
-
 
 class HttpMessageInterface {
 public:
@@ -99,13 +101,10 @@ protected:
     std::map<std::string, std::string> headers_;
     std::string content_;
 
-    friend std::string to_string(const HttpVersion& version);
     void SetContentLength() {
         SetHeader("Content-Length", std::to_string(content_.length()));
     }
 };
-
-std::string to_string(const HttpVersion& version);
 
 class HttpRequest : public HttpMessageInterface {
 public:
@@ -130,8 +129,6 @@ public:
 private:
     HttpMethod method_;
     Uri uri_;
-
-    // friend HttpRequest string_to_request(const std::string& request_string);
 };
 
 
@@ -139,7 +136,7 @@ class HttpResponse : public HttpMessageInterface {
 public:
     HttpResponse(HttpStatusCode status_code = HttpStatusCode::Ok)
         :status_code_(status_code) {}
-    void SetStatuscode(HttpStatusCode status_code) {
+    void SetStatusCode(HttpStatusCode status_code) {
         status_code_ = status_code;
     }
     HttpStatusCode status_code() const {
@@ -149,10 +146,12 @@ private:
     HttpStatusCode status_code_;
 
     friend std::string to_string(const HttpStatusCode& status_code);
-    friend std::string to_string(const HttpResponse& response, bool Is_sendContent);
+
 };
 
 // HttpRequest string_to_request(const std::string& request_string);
 
 std::string to_string(const HttpStatusCode& status_code);
-std::string to_string(const HttpResponse& response, bool Is_sendContent);
+std::string to_string(const HttpResponse& response);
+std::string to_string(const HttpRequest& request);
+

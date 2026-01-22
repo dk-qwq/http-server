@@ -19,6 +19,31 @@ std::string to_string(const HttpVersion& version) {
     }
 }
 
+std::string to_string(const HttpMethod& method) {
+    switch(method) {
+        case HttpMethod::GET:
+            return "GET";
+        case HttpMethod::HEAD:
+            return "HEAD";
+        case HttpMethod::POST:
+            return "POST";
+        case HttpMethod::PUT:
+            return "PUT";
+        case HttpMethod::DELETE:
+            return "DELETE";
+        case HttpMethod::CONNECT:
+            return "CONNECT";
+        case HttpMethod::OPTIONS:
+            return "OPTIONS";
+        case HttpMethod::TRACE:
+            return "TRACE";
+        case HttpMethod::PATCH:
+            return "PATCH";
+        default:
+            throw std::invalid_argument("Invalid HTTP method");
+    }
+}
+
 HttpVersion string_to_version(const std::string& version_string) {
     std::string version_string_uppered;
     for(auto c: version_string) {
@@ -128,7 +153,7 @@ std::string to_string(const HttpStatusCode& status_code) {
     }
 }
 
-std::string to_string(const HttpResponse& response, bool Is_sendContent) {
+std::string to_string(const HttpResponse& response) {
     std::ostringstream oss;
     oss << to_string(response.version()) << ' '
         << static_cast<int>(response.status_code()) << ' '
@@ -137,65 +162,19 @@ std::string to_string(const HttpResponse& response, bool Is_sendContent) {
         oss << key << ": " << value << "\r\n";
     }
     oss << "\r\n";
-    if(Is_sendContent) oss << response.content() << "\r\n";
+    oss << response.content();
     return oss.str();
 }
 
-HttpRequest string_to_request(const std::string& request_string) {
-    std::istringstream iss;
-    std::string start_line, headers, body;
-    std::string line;
-    std::string method_string, path, version_string, key, value;
-    HttpRequest request;
-    size_t lpos = 0, rpos = 0;
-
-    rpos = request_string.find("\r\n", lpos);
-    if(rpos == std::string::npos) {
-        throw std::invalid_argument("Could not find start line");
+std::string to_string(const HttpRequest& request) {
+    std::ostringstream oss;
+    oss << to_string(request.method()) << ' '
+        << request.uri().path() << ' '
+        << to_string(request.version()) << "\r\n";
+    for(const auto& [key, value]: request.header()) {
+        oss << key << ": " << value << "\r\n";
     }
-    start_line = request_string.substr(lpos, rpos - lpos);
-
-    lpos = rpos + 2;
-    rpos = request_string.find("\r\n\r\n", lpos);
-    if(rpos != std::string::npos) {
-        headers = request_string.substr(lpos, rpos - lpos);
-
-        if(rpos + 4 < request_string.length()) {
-            body = request_string.substr(rpos + 4);
-        }
-    }
-
-    iss.str(start_line);
-    iss >> method_string >> path >> version_string;
-    if(!iss.good() && !iss.eof()) {
-        throw std::invalid_argument("Invalid start line format");
-    }
-    request.SetMethod(string_to_method(method_string));
-    request.SetUri(Uri(path));
-    request.version_ = string_to_version(version_string);
-
-    iss.clear();
-    iss.str(headers);
-    while(std::getline(iss, line)) {
-        size_t colon_pos = line.find(": ");
-        if(colon_pos == std::string::npos) {
-            continue;
-        }
-        key = line.substr(0, colon_pos);
-        value = line.substr(colon_pos + 2);
-        
-        auto is_space = [](char c) {
-            return std::isspace(c);
-        };
-        std::erase_if(key, is_space);
-        std::erase_if(value, is_space);
-
-        request.SetHeader(key, value);
-
-    }
-
-    request.SetContent(body);
-
-    return request;
+    oss << "\r\n";
+    oss << request.content();
+    return oss.str();
 }
-

@@ -15,6 +15,7 @@ enum class ParseState {
 class HttpParser{
 public:
     HttpParser();
+    ~HttpParser() = default;
     
     void feed(const char* data, size_t len);
 

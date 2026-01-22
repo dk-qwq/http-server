@@ -9,20 +9,11 @@
 #include <functional>
 #include <utility>
 #include <random>
+#include <memory>
 
-#include <http_message.h>
-
-static constexpr size_t kMaxBufferSize = 4096;
-
-size_t GetContentLength(char* buffer, size_t len);
-
-struct EventData {
-    EventData() : fd(0), length(SIZE_MAX), cursor(0), buffer() {}
-    int fd;
-    size_t length;
-    size_t cursor;
-    char buffer[kMaxBufferSize];
-};
+#include "http_message.h"
+#include "connection.h"
+#include "config.h"
 
 using HttpRequestHandler_t = std::function<HttpResponse(const HttpRequest&)>;
 
@@ -72,11 +63,9 @@ private:
     void SetUpEpoll();
     void Listen();
     void ProcessEvent(int worker_id);
-    void HandlerEpollEvent(int epoll_fd, std::uint32_t event, EventData* data);
+    void HandlerEpollEvent(int epoll_fd, std::uint32_t event, std::unique_ptr<Connection> connection);
     void ControlEpollEvent(int epoll_fd, int op, int fd,
                                  std::uint32_t event = 0, void* data = nullptr);
 
     HttpResponse HandlerHttpRequest(const HttpRequest& request);
-
-    void HandleHttpData(const EventData& raw_request, EventData* raw_response);
 };

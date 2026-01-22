@@ -1,5 +1,4 @@
-#ifndef CONFIG_H_
-#define CONFIG_H_
+#pragma once
 
 #include <cstdint>
 
@@ -8,4 +7,4 @@
 constexpr std::string kDefaultHost = "127.0.0.1";
 constexpr std::uint16_t kDefaultPort = 8080;
 
-#endif
+static constexpr size_t kMaxBufferSize = 4096;
